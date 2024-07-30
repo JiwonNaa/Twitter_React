@@ -1,5 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
+import { auth } from "../firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth/web-extension";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -33,7 +36,13 @@ const Input = styled.input`
   }
   `;
 
+const Error=styled.span`
+  font-weight: 600;
+  color: tomato;
+  `;
+
 export default function CreateAccount(){
+  const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,14 +51,33 @@ export default function CreateAccount(){
 
   //input 내용 바꾸기
   const onChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
-   
+    const {
+      target:{name, value}
+    } = e;
+   if(name === "name"){
+    setName(value);
+   }else if(name === "email"){
+    setEmail(value);
+   }else if(name === "password"){
+    setPassword(value);
+   }
   };
 
   //input 제출
-  const onSubmit =(e:React.FormEvent<HTMLFormElement>)=>{
+  const onSubmit = async (e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
+    if(isLoading || name === "" || email==="" || password==="") return;
       try{
-        
+        setLoading(true);
+       const credentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password);
+        console.log(credentials.user);
+        await updateProfile(credentials.user,{
+          displayName:name,
+        });
+        navigate("/");
       }catch(e){
 
       }finally{
@@ -59,13 +87,14 @@ export default function CreateAccount(){
 
   return (
   <Wrapper>
-    <Title>Log into X</Title>
+    <Title>Join X</Title>
     <Form onSubmit={onSubmit}>
         <Input onChange={onChange} name="name" value={name} placeholder="Name" type="text" required/>
         <Input onChange={onChange} name="email" value={email} placeholder="Email" type="email" required/>
         <Input onChange={onChange} name="password" value={password} placeholder="Password" type="password" required/>
         <Input type="submit" value="회원가입" />
     </Form>
+    {error !==""? <Error>{error}</Error>:null}
   </Wrapper>
   );
 }
