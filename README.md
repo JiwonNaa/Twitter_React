@@ -8,5 +8,7 @@
 </div>
 
 <h2 style="color: #000000; text-align: start;" data-ke-size="size26"><b>🖼️ 화면</b></h2>
-![image](https://github.com/user-attachments/assets/67e42c59-b347-491c-b8aa-4934b66dc6cb)
+
+![image](https://github.com/user-attachments/assets/e24a4463-0345-44cc-885c-aca007d50123)
+
 
