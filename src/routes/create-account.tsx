@@ -69,7 +69,7 @@ export default function CreateAccount(){
     if(isLoading || name === "" || email==="" || password==="") return;
       try{
         setLoading(true);
-       const credentials = await createUserWithEmailAndPassword(
+        const credentials = await createUserWithEmailAndPassword(
         auth,
         email,
         password);
