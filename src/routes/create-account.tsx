@@ -2,7 +2,8 @@ import { useState } from "react";
 import styled from "styled-components";
 import { auth } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth/web-extension";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -17,6 +18,7 @@ const Title = styled.h1`
   `;
 const Form = styled.form`
   margin-top: 50px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -41,6 +43,12 @@ const Error=styled.span`
   color: tomato;
   `;
 
+const Switcher = styled.span`
+margin-top: 20px;
+a{
+  color: #00c8ff;
+}
+`
 export default function CreateAccount(){
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
@@ -66,6 +74,7 @@ export default function CreateAccount(){
   //input 제출
   const onSubmit = async (e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
+    setError("");
     if(isLoading || name === "" || email==="" || password==="") return;
       try{
         setLoading(true);
@@ -80,6 +89,10 @@ export default function CreateAccount(){
         navigate("/");
       }catch(e){
 
+      if(e instanceof FirebaseError){
+        setError(e.message)
+      }
+
       }finally{
         setLoading(false);
       }
@@ -92,9 +105,14 @@ export default function CreateAccount(){
         <Input onChange={onChange} name="name" value={name} placeholder="Name" type="text" required/>
         <Input onChange={onChange} name="email" value={email} placeholder="Email" type="email" required/>
         <Input onChange={onChange} name="password" value={password} placeholder="Password" type="password" required/>
-        <Input type="submit" value="회원가입" />
+        <Input type="submit" value={isLoading?"Loading...":"회원가입"} />
     </Form>
     {error !==""? <Error>{error}</Error>:null}
+
+    <Switcher>
+      Already have an account? <Link to ="/login">Log in &rarr;</Link>
+    </Switcher>
+
   </Wrapper>
   );
 }
